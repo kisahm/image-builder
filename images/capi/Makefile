@@ -51,7 +51,7 @@ version: ## Display version of image-builder
 
 .PHONY: deps
 deps: ## Installs/checks all dependencies
-deps: deps-ami deps-azure deps-do deps-gce deps-ova deps-openstack deps-qemu deps-raw deps-oci deps-osc deps-vbox deps-powervs deps-nutanix deps-hcloud
+deps: deps-ami deps-azure deps-do deps-gce deps-gke deps-ova deps-openstack deps-qemu deps-raw deps-oci deps-osc deps-vbox deps-powervs deps-nutanix deps-hcloud
 
 .PHONY: deps-common
 deps-common: ## Installs/checks dependencies common to most builds
@@ -93,6 +93,12 @@ deps-osc: deps-common
 .PHONY: deps-gce
 deps-gce: ## Installs/checks dependencies for GCE builds
 deps-gce: deps-common
+	hack/ensure-goss.sh
+	$(PACKER) init packer/config.pkr.hcl
+
+.PHONY: deps-gke
+deps-gke: ## Installs/checks dependencies for GCE builds
+deps-gke: deps-common
 	hack/ensure-goss.sh
 	$(PACKER) init packer/config.pkr.hcl
 
@@ -343,6 +349,7 @@ NODE_OVA_VSPHERE_CLONE_BUILD_NAMES		:=	$(addprefix node-ova-vsphere-clone-,$(PLA
 
 AMI_BUILD_NAMES			   ?= ami-centos-7 ami-ubuntu-2004 ami-ubuntu-2204 ami-amazon-2 ami-flatcar ami-windows-2019 ami-rockylinux-8 ami-rhel-8
 GCE_BUILD_NAMES			   ?= gce-ubuntu-2004 gce-ubuntu-2204 gce-rhel-8
+GKE_BUILD_NAMES			   ?= gke-ubuntu-2204
 
 # Make needs these lists to be space delimited, no quotes
 VHD_TARGETS := $(shell grep VHD_TARGETS azure_targets.sh | sed 's/VHD_TARGETS=//' | tr -d \")
@@ -391,6 +398,8 @@ AMI_BUILD_TARGETS	:= $(addprefix build-,$(AMI_BUILD_NAMES))
 AMI_VALIDATE_TARGETS	:= $(addprefix validate-,$(AMI_BUILD_NAMES))
 GCE_BUILD_TARGETS	:= $(addprefix build-,$(GCE_BUILD_NAMES))
 GCE_VALIDATE_TARGETS	:= $(addprefix validate-,$(GCE_BUILD_NAMES))
+GKE_BUILD_TARGETS	:= $(addprefix build-,$(GKE_BUILD_NAMES))
+GKE_VALIDATE_TARGETS	:= $(addprefix validate-,$(GKE_BUILD_NAMES))
 AZURE_BUILD_VHD_TARGETS	:= $(addprefix build-,$(AZURE_BUILD_VHD_NAMES))
 AZURE_VALIDATE_VHD_TARGETS	:= $(addprefix validate-,$(AZURE_BUILD_VHD_NAMES))
 AZURE_BUILD_SIG_TARGETS	:= $(addprefix build-,$(AZURE_BUILD_SIG_NAMES))
@@ -473,6 +482,15 @@ $(GCE_BUILD_TARGETS): deps-gce
 .PHONY: $(GCE_VALIDATE_TARGETS)
 $(GCE_VALIDATE_TARGETS): deps-gce
 	$(PACKER) validate $(PACKER_NODE_FLAGS) -var-file="$(abspath packer/gce/$(subst validate-gce-,,$@).json)" $(ABSOLUTE_PACKER_VAR_FILES) packer/gce/packer.json
+
+.PHONY: $(GKE_BUILD_TARGETS)
+$(GKE_BUILD_TARGETS): deps-gke
+	$(PACKER) build $(PACKER_NODE_FLAGS) -var-file="$(abspath packer/gke/$(subst build-gke-,,$@).json)" $(ABSOLUTE_PACKER_VAR_FILES) packer/gke/packer.json
+
+.PHONY: $(GKE_VALIDATE_TARGETS)
+$(GKE_VALIDATE_TARGETS): deps-gke
+	$(PACKER) validate $(PACKER_NODE_FLAGS) -var-file="$(abspath packer/gke/$(subst validate-gke-,,$@).json)" $(ABSOLUTE_PACKER_VAR_FILES) packer/gke/packer.json
+
 
 .PHONY: $(AZURE_BUILD_VHD_TARGETS)
 $(AZURE_BUILD_VHD_TARGETS): deps-azure
@@ -675,9 +693,12 @@ build-do-centos-7: ## Builds Centos 7 DigitalOcean Snapshot
 build-do-all: $(DO_BUILD_TARGETS) ## Builds all DigitalOcean Snapshot
 
 build-gce-ubuntu-2004: ## Builds the GCE ubuntu-2004 image
+build-gke-ubuntu-2004: ## Builds the GKE ubuntu-2004 image
 build-gce-ubuntu-2204: ## Builds the GCE ubuntu-2204 image
+build-gke-ubuntu-2204: ## Builds the GKE ubuntu-2204 image
 build-gce-rhel-8: ## Builds the GCE rhel-8 image
 build-gce-all: $(GCE_BUILD_TARGETS) ## Builds all GCE image
+build-gke-all: $(GKE_BUILD_TARGETS) ## Builds all GCE image
 
 build-node-ova-local-centos-7: ## Builds CentOS 7 Node OVA w local hypervisor
 build-node-ova-local-flatcar: ## Builds Flatcar stable Node OVA w local hypervisor
@@ -856,6 +877,10 @@ validate-gce-ubuntu-2204: ## Validates Ubuntu 22.04 GCE Snapshot Packer config
 validate-gce-rhel-8: ## Validates RHEL 8 GCE Snapshot Packer config
 validate-gce-all: $(GCE_VALIDATE_TARGETS) ## Validates all GCE Snapshot Packer config
 
+validate-gke-ubuntu-2004: ## Validates Ubuntu 20.04 GCE Snapshot Packer config
+validate-gke-ubuntu-2204: ## Validates Ubuntu 22.04 GCE Snapshot Packer config
+validate-gke-all: $(GKE_VALIDATE_TARGETS) ## Validates all GCE Snapshot Packer config
+
 validate-node-ova-local-centos-7: ## Validates CentOS 7 Node OVA Packer config w local hypervisor
 validate-node-ova-local-flatcar: ## Validates Flatcar stable Node OVA Packer config w local hypervisor
 validate-node-ova-local-photon-3: ## Validates Photon 3 Node OVA Packer config w local hypervisor
@@ -947,6 +972,7 @@ validate-all: validate-ami-all \
 	validate-azure-all \
 	validate-do-all \
 	validate-gce-all \
+	validate-gke-all \
 	validate-node-ova-local-all \
 	validate-qemu-all \
 	validate-raw-all \

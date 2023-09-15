@@ -1,0 +1,17 @@
+- name: Set systemd unit files for GKE
+  copy:
+    dest: "/{{item}}"
+    src: "{{item}}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - etc/systemd/system/kube-node-installation.service
+    - etc/systemd/system/kube-node-configuration.service
+    - etc/systemd/system/kube-container-runtime-monitor.service
+    - etc/systemd/system/kubelet-monitor.service
+    - etc/systemd/system/kube-logrotate.timer
+    - etc/systemd/system/kube-logrotate.service
+    - etc/systemd/system/kubernetes.target
+    - etc/modprobe.d/sunrpc.conf
+    - home/kubernetes/configuration-helper.sh

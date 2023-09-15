@@ -1,0 +1,13 @@
+[Unit]
+Description=Configure kubernetes node
+After=kube-node-installation.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/chmod 544 /home/kubernetes/bin/configure-helper.sh
+ExecStart=/home/kubernetes/bin/configure-helper.sh
+StandardOutput=journal+console
+
+[Install]
+WantedBy=kubernetes.target
