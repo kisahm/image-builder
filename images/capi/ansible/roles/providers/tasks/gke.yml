@@ -1,3 +1,9 @@
+- name: create Kubernetes home dir
+  file:
+    path: /home/kubernetes
+    state: directory
+    mode: '0755'
+    
 - name: Set systemd unit files for GKE
   copy:
     dest: "/{{item}}"
