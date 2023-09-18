@@ -6,6 +6,13 @@
   with_items:
     - home/kubernetes
     - home/kubernetes/bin
+
+- name: delete old stuff
+  file: 
+    path: "/{{item}}"
+    state: absent
+  with_items:
+    -  usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf 
     
 - name: Set files for GKE
   copy:
@@ -25,6 +32,7 @@
     - etc/systemd/system/kubernetes.target
     - etc/modprobe.d/sunrpc.conf
     - etc/cloud/cloud.cfg
+    - lib/systemd/system/kubelet.service
 
 - name: reload-systemd
   systemd:
@@ -40,6 +48,7 @@
     - kube-logrotate.timer
     - kube-logrotate.service
     - kubernetes.target
+    - kubelet
 
 - name: Set helper scripts
   copy:
