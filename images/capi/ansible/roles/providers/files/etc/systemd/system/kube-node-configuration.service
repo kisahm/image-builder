@@ -5,7 +5,7 @@ After=kube-node-installation.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/home/kubernetes/configure-helper.sh
+ExecStart=/home/kubernetes/configuration-helper.sh
 StandardOutput=journal+console
 
 [Install]
