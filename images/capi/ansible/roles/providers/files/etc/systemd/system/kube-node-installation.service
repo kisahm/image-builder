@@ -5,7 +5,7 @@ After=network-online.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-Exec=/home/kubernetes/configuration.sh
+ExecStart=/home/kubernetes/configuration.sh
 StandardOutput=journal+console
 
 [Install]
