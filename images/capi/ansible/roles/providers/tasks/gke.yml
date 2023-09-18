@@ -21,3 +21,4 @@
     - etc/systemd/system/kubernetes.target
     - etc/modprobe.d/sunrpc.conf
     - home/kubernetes/configuration-helper.sh
+    - home/kubernetes/gke-internal-configuration-helper.sh
