@@ -6,5 +6,10 @@
   "source_image_family": "ubuntu-2204-lts",
   "ssh_username": "ubuntu",
   "zone": "us-east4-a",
-  "ansible_extra_vars": "gkeEnabled=true"
+  "ansible_extra_vars": "gkeEnabled=true",
+  "build_timestamp": "nightly",
+  "kubernetes_deb_version": "1.27.5-1.1",
+  "kubernetes_rpm_version": "1.27.5",
+  "kubernetes_semver": "v1.27.5",
+  "kubernetes_series": "v1.27"
 }
