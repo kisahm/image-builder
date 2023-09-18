@@ -20,5 +20,14 @@
     - etc/systemd/system/kube-logrotate.service
     - etc/systemd/system/kubernetes.target
     - etc/modprobe.d/sunrpc.conf
+
+- name: Set helper scripts
+  copy:
+    dest: "/{{item}}"
+    src: "{{item}}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
     - home/kubernetes/configuration-helper.sh
     - home/kubernetes/gke-internal-configuration-helper.sh

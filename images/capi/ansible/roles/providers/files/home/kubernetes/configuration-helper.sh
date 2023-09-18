@@ -158,7 +158,7 @@ function config-ip-firewall {
 
   if [[ "${NON_MASQUERADE_CIDR:-}" == "0.0.0.0/0" ]]; then
     echo "Add rules for ip masquerade"
-    iptables -w -t nat -N IP-MASQ
+    iptables -w -t nat -N IP-MASQ || true
     iptables -w -t nat -A POSTROUTING -m comment --comment "ip-masq: ensure nat POSTROUTING directs all non-LOCAL destination traffic to our custom IP-MASQ chain" -m addrtype ! --dst-type LOCAL -j IP-MASQ
     iptables -w -t nat -A IP-MASQ -d 169.254.0.0/16 -m comment --comment "ip-masq: local traffic is not subject to MASQUERADE" -j RETURN
     iptables -w -t nat -A IP-MASQ -d 10.0.0.0/8 -m comment --comment "ip-masq: RFC 1918 reserved range is not subject to MASQUERADE" -j RETURN
@@ -179,7 +179,7 @@ function config-ip-firewall {
   # node because we don't expect the daemonset to run on this node.
   if [[ "${ENABLE_METADATA_CONCEALMENT:-}" == "true" ]] && [[ ! "${METADATA_CONCEALMENT_NO_FIREWALL:-}" == "true" ]]; then
     echo "Add rule for metadata concealment"
-    ip addr add dev lo 169.254.169.252/32 scope host
+    ip addr add dev lo 169.254.169.252/32 scope host || true
     iptables -w -t nat -I PREROUTING -p tcp ! -i eth0 -d "${METADATA_SERVER_IP}" --dport 80 -m comment --comment "metadata-concealment: bridge traffic to metadata server goes to metadata proxy" -j DNAT --to-destination 169.254.169.252:988
     iptables -w -t nat -I PREROUTING -p tcp ! -i eth0 -d "${METADATA_SERVER_IP}" --dport 8080 -m comment --comment "metadata-concealment: bridge traffic to metadata server goes to metadata proxy" -j DNAT --to-destination 169.254.169.252:987
   fi
@@ -1292,7 +1292,7 @@ function create-kubeconfig {
   local path="/etc/srv/kubernetes/${component}/kubeconfig"
   mkdir -p "/etc/srv/kubernetes/${component}"
 
-  if [[ -e "${KUBE_HOME}/bin/gke-internal-configure-helper.sh" ]]; then
+  if [[ -e "${KUBE_HOME}/gke-internal-configure-helper.sh" ]]; then
     gke-internal-create-kubeconfig "${component}" "${token}" "${path}"
   else
     echo "Creating kubeconfig file for component ${component}"
@@ -2144,7 +2144,7 @@ function update-node-label() {
 #   CLOUD_CONFIG_MOUNT
 #   DOCKER_REGISTRY
 function start-kube-controller-manager {
-  if [[ -e "${KUBE_HOME}/bin/gke-internal-configure-helper.sh" ]]; then
+  if [[ -e "${KUBE_HOME}/gke-internal-configure-helper.sh" ]]; then
     if ! deploy-kube-controller-manager-via-kube-up; then
       echo "kube-controller-manager is configured to not be deployed through kube-up."
       return
@@ -2359,7 +2359,7 @@ function start-cloud-controller-manager {
 # Assumed vars (which are calculated in compute-master-manifest-variables)
 #   DOCKER_REGISTRY
 function start-kube-scheduler {
-  if [[ -e "${KUBE_HOME}/bin/gke-internal-configure-helper.sh" ]]; then
+  if [[ -e "${KUBE_HOME}/gke-internal-configure-helper.sh" ]]; then
     if ! deploy-kube-scheduler-via-kube-up; then
       echo "kube-scheduler is configured to not be deployed through kube-up."
       return
@@ -3015,9 +3015,9 @@ function setup-kubelet-dir {
 
 # Override for GKE custom master setup scripts (no-op outside of GKE).
 function gke-master-start {
-  if [[ -e "${KUBE_HOME}/bin/gke-internal-configure-helper.sh" ]]; then
+  if [[ -e "${KUBE_HOME}/gke-internal-configure-helper.sh" ]]; then
     echo "Running GKE internal configuration script"
-    . "${KUBE_HOME}/bin/gke-internal-configure-helper.sh"
+    . "${KUBE_HOME}/gke-internal-configure-helper.sh"
     gke-internal-master-start
  elif [[ -n "${KUBE_BEARER_TOKEN:-}" ]]; then
    echo "setting up local admin kubeconfig"
