@@ -1635,24 +1635,7 @@ function start-kubelet {
   local kubelet_opts="${KUBELET_ARGS} ${KUBELET_CONFIG_FILE_ARG:-} ${kubelet_cgroup_driver:-}"
   echo "KUBELET_OPTS=\"${kubelet_opts}\"" > "${kubelet_env_file}"
   echo "KUBE_COVERAGE_FILE=\"/var/log/kubelet.cov\"" >> "${kubelet_env_file}"
-
-  # Write the systemd service file for kubelet.
-  cat <<EOF >/etc/systemd/system/kubelet.service
-[Unit]
-Description=Kubernetes kubelet
-Requires=network-online.target
-After=network-online.target
-
-[Service]
-Restart=always
-RestartSec=10
-EnvironmentFile=${kubelet_env_file}
-ExecStart=${kubelet_bin} \$KUBELET_OPTS
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
+  
   systemctl daemon-reload
   systemctl start kubelet.service
 }
