@@ -3461,6 +3461,7 @@ function main() {
   if [[ -f "${KUBE_HOME}/kubelet-config.yaml" ]]; then
     echo "Found Kubelet config file at ${KUBE_HOME}/kubelet-config.yaml"
     KUBELET_CONFIG_FILE_ARG="--config ${KUBE_HOME}/kubelet-config.yaml"
+    cp ${KUBE_HOME}/kubelet-config.yaml /var/lib/kubelet/config.yaml
   fi
 
   if [[ -e "${KUBE_HOME}/kube-master-certs" ]]; then
