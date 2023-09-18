@@ -12,6 +12,7 @@
     group: root
     mode: "0644"
   with_items:
+    - etc/systemd/system/kube-bootstrap-logs-forwarder.service
     - etc/systemd/system/kube-node-installation.service
     - etc/systemd/system/kube-node-configuration.service
     - etc/systemd/system/kube-container-runtime-monitor.service
