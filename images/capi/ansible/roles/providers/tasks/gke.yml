@@ -4,7 +4,7 @@
     state: directory
     mode: '0755'
     
-- name: Set systemd unit files for GKE
+- name: Set files for GKE
   copy:
     dest: "/{{item}}"
     src: "{{item}}"
@@ -20,6 +20,22 @@
     - etc/systemd/system/kube-logrotate.service
     - etc/systemd/system/kubernetes.target
     - etc/modprobe.d/sunrpc.conf
+    - etc/cloud/cloud.cfg
+
+- name: reload-systemd
+  systemd:
+    name: "{{item}}"
+    enabled: true
+    daemon_reload: true
+  with_items:
+    - kube-bootstrap-logs-forwarder.service
+    - kube-node-installation.service
+    - kube-node-configuration.service
+    - kube-container-runtime-monitor.service
+    - kubelet-monitor.service
+    - kube-logrotate.timer
+    - kube-logrotate.service
+    - kubernetes.target
 
 - name: Set helper scripts
   copy:
@@ -29,5 +45,7 @@
     group: root
     mode: "0755"
   with_items:
+    - home/kubernetes/configuration.sh
     - home/kubernetes/configuration-helper.sh
     - home/kubernetes/gke-internal-configuration-helper.sh
+

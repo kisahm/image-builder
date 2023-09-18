@@ -1,0 +1,14 @@
+[Unit]
+Description=Forwards Kubernetes bootstrap logs to serial port.
+Before=kube-node-installation.service
+
+[Service]
+User=kube-bootstrap-logs-forwarder
+Group=systemd-journal
+SupplementaryGroups=serial
+ExecStart=journalctl --no-tail --no-pager --follow --utc --output short-iso --unit kube-node-installation --unit kube-node-configuration --unit kubelet
+StandardOutput=tty
+TTYPath=/dev/ttyS2
+
+[Install]
+WantedBy=kubernetes.target
