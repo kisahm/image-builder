@@ -1,8 +1,11 @@
 - name: create Kubernetes home dir
   file:
-    path: /home/kubernetes
+    path: "/{{item}}"
     state: directory
     mode: '0755'
+  with_items:
+    - home/kubernetes
+    - home/kubernetes/bin
     
 - name: Set files for GKE
   copy:
