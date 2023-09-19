@@ -2,7 +2,7 @@
 Description=kubelet: The Kubernetes Node Agent
 Documentation=https://kubernetes.io/docs/
 Wants=network-online.target
-After=network-online.target
+After=kube-node-configuration.service
 
 [Service]
 EnvironmentFile=/etc/default/kubelet
@@ -12,4 +12,4 @@ StartLimitInterval=0
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=kubernetes.target
