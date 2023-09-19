@@ -6,15 +6,6 @@
   with_items:
     - home/kubernetes
     - home/kubernetes/bin
-
-- name: delete old stuff
-  file: 
-    path: "/{{item}}"
-    state: absent
-  with_items:
-    - usr/lib/systemd/system/kubelet.service.d
-    - usr/lib/systemd/system/kubelet.service
-
     
 - name: Set files for GKE
   copy:
