@@ -3589,3 +3589,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     sleep 3
   fi
 fi
+
+systemctl restart kubelet
