@@ -2,7 +2,6 @@
 Description=kubelet: The Kubernetes Node Agent
 Documentation=https://kubernetes.io/docs/
 Wants=network-online.target
-After=kube-node-configuration.service
 
 [Service]
 EnvironmentFile=/etc/default/kubelet
