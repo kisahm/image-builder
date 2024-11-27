@@ -3213,16 +3213,6 @@ EOF
 EOF
   fi
 
-# DISABLED
-#   # Reuse docker group for containerd.
-#   local -r containerd_gid="$(grep ^docker: /etc/group | cut -d: -f 3)"
-#   if [[ -n "${containerd_gid:-}" ]]; then
-#     cat >> "${config_path}" <<EOF
-# # reuse id of the docker group
-# [grpc]
-#   gid = ${containerd_gid}
-# EOF
-#   fi
   chmod 644 "${config_path}"
 
   echo "Restart containerd to load the config change"
